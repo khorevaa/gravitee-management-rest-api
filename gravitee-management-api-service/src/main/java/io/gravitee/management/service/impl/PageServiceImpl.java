@@ -65,8 +65,8 @@ import static java.util.Collections.emptyList;
 /**
  * @author Titouan COMPIEGNE (titouan.compiegne at graviteesource.com)
  * @author Nicolas GERAUD (nicolas.geraud at graviteesource.com)
- * @author GraviteeSource Team
  * @author Guillaume Gillon
+ * @author GraviteeSource Team
  */
 @Component
 public class PageServiceImpl extends TransactionalService implements PageService, ApplicationContextAware {
@@ -108,91 +108,83 @@ public class PageServiceImpl extends TransactionalService implements PageService
 	@Autowired
 	private SearchEngineService searchEngineService;
 
-	@Override
-	public List<PageListItem> findApiPagesByApi(String apiId) {
-	    return findApiPagesByApiAndHomepage(apiId, null, null);
-    }
+//	public List<PageListItem> findApiPagesByApi(String apiId) {
+//	    return findApiPagesByApiAndHomepage(apiId, null, null);
+//    }
+//
+//	public List<PageListItem> findApiPagesByApiAndHomepage(String apiId, Boolean homepage, Boolean flatMode ) {
+//		try {
+//			final Collection<Page> pages;
+//			if (homepage == null) {
+//				pages = pageRepository.findApiPageByApiId(apiId);
+//			} else {
+//				pages = pageRepository.findApiPageByApiIdAndHomepage(apiId, homepage);
+//			}
+//			if (pages == null) {
+//				return emptyList();
+//			}
+//
+//			if(flatMode == null || Boolean.FALSE.equals(flatMode)) {
+//                Map<String, List<Page>> groupedParent =
+//                        pages.stream().filter(p -> (p.getParentId() != null && p.getParentId().length() > 0)).sorted(Comparator.comparingInt(Page::getOrder)).collect(Collectors.groupingBy(Page::getParentId));
+//
+//                return pages.stream()
+//                        .filter(p -> (p.getParentId() == null || p.getParentId().length() == 0))
+//                        .map(p -> this.reduce(p,groupedParent))
+//                        .sorted(Comparator.comparingInt(PageListItem::getOrder))
+//                        .collect(Collectors.toList());
+//			} else {
+//                return pages.stream()
+//                        .map(this::reduce)
+//                        .sorted(Comparator.comparingInt(PageListItem::getOrder))
+//                        .collect(Collectors.toList());
+//			}
+//
+//		} catch (TechnicalException ex) {
+//			logger.error("An error occurs while trying to get API pages using api ID {}", apiId, ex);
+//			throw new TechnicalManagementException(
+//					"An error occurs while trying to get API pages using api ID " + apiId, ex);
+//		}
+//	}
 
-	@Override
-	public List<PageListItem> findApiPagesByApiAndHomepage(String apiId, Boolean homepage, Boolean flatMode ) {
-		try {
-			final Collection<Page> pages;
-			if (homepage == null) {
-				pages = pageRepository.findApiPageByApiId(apiId);
-			} else {
-				pages = pageRepository.findApiPageByApiIdAndHomepage(apiId, homepage);
-			}
-			if (pages == null) {
-				return emptyList();
-			}
-
-			if(flatMode == null || Boolean.FALSE.equals(flatMode)) {
-                Map<String, List<Page>> groupedParent =
-                        pages.stream().filter(p -> (p.getParentId() != null && p.getParentId().length() > 0)).sorted(Comparator.comparingInt(Page::getOrder)).collect(Collectors.groupingBy(Page::getParentId));
-
-                return pages.stream()
-                        .filter(p -> (p.getParentId() == null || p.getParentId().length() == 0))
-                        .map(p -> this.reduce(p,groupedParent))
-                        .sorted(Comparator.comparingInt(PageListItem::getOrder))
-                        .collect(Collectors.toList());
-			} else {
-                return pages.stream()
-                        .map(this::reduce)
-                        .sorted(Comparator.comparingInt(PageListItem::getOrder))
-                        .collect(Collectors.toList());
-			}
-
-		} catch (TechnicalException ex) {
-			logger.error("An error occurs while trying to get API pages using api ID {}", apiId, ex);
-			throw new TechnicalManagementException(
-					"An error occurs while trying to get API pages using api ID " + apiId, ex);
-		}
-	}
-
-	@Override
-	public List<PageListItem> findPortalPagesByHomepage(Boolean homepage, Boolean flatMode) {
-		try {
-			final Collection<Page> pages;
-			if (homepage == null) {
-				pages = pageRepository.findPortalPages();
-			} else {
-				pages = pageRepository.findPortalPageByHomepage(homepage);
-			}
-			if (pages == null) {
-				return emptyList();
-			}
-
-			if(flatMode == null || Boolean.FALSE.equals(flatMode)) {
-                Map<String, List<Page>> groupedParent =
-                        pages.stream().filter(p -> (p.getParentId() != null && p.getParentId().length() > 0)).sorted(Comparator.comparingInt(Page::getOrder)).collect(Collectors.groupingBy(Page::getParentId));
-
-
-                return pages.stream()
-                        .filter(p -> (p.getParentId() == null || p.getParentId().length() == 0))
-                        .map(p -> this.reduce(p,groupedParent))
-                        .sorted(Comparator.comparingInt(PageListItem::getOrder))
-                        .collect(Collectors.toList());
-            } else {
-                return pages.stream()
-                        .map(this::reduce)
-                        .sorted(Comparator.comparingInt(PageListItem::getOrder))
-                        .collect(Collectors.toList());
-            }
-
-		} catch (TechnicalException ex) {
-			logger.error("An error occurs while trying to get Portal pages", ex);
-			throw new TechnicalManagementException(
-					"An error occurs while trying to get Portal pages", ex);
-		}
-	}
+//	public List<PageListItem> findPortalPagesByHomepage(Boolean homepage, Boolean flatMode) {
+//		try {
+//			final Collection<Page> pages;
+//			if (homepage == null) {
+//				pages = pageRepository.findPortalPages();
+//			} else {
+//				pages = pageRepository.findPortalPageByHomepage(homepage);
+//			}
+//			if (pages == null) {
+//				return emptyList();
+//			}
+//
+//			if(flatMode == null || Boolean.FALSE.equals(flatMode)) {
+//                Map<String, List<Page>> groupedParent =
+//                        pages.stream().filter(p -> (p.getParentId() != null && p.getParentId().length() > 0)).sorted(Comparator.comparingInt(Page::getOrder)).collect(Collectors.groupingBy(Page::getParentId));
+//
+//
+//                return pages.stream()
+//                        .filter(p -> (p.getParentId() == null || p.getParentId().length() == 0))
+//                        .map(p -> this.reduce(p,groupedParent))
+//                        .sorted(Comparator.comparingInt(PageListItem::getOrder))
+//                        .collect(Collectors.toList());
+//            } else {
+//                return pages.stream()
+//                        .map(this::reduce)
+//                        .sorted(Comparator.comparingInt(PageListItem::getOrder))
+//                        .collect(Collectors.toList());
+//            }
+//
+//		} catch (TechnicalException ex) {
+//			logger.error("An error occurs while trying to get Portal pages", ex);
+//			throw new TechnicalManagementException(
+//					"An error occurs while trying to get Portal pages", ex);
+//		}
+//	}
 
 	@Override
 	public PageEntity findById(String pageId) {
-		return findById(pageId, false);
-	}
-
-	@Override
-	public PageEntity findById(String pageId, boolean transform) {
 		try {
 			logger.debug("Find page by ID: {}", pageId);
 
@@ -200,13 +192,6 @@ public class PageServiceImpl extends TransactionalService implements PageService
 
 			if (page.isPresent()) {
 				PageEntity pageEntity = convert(page.get());
-				if (transform) {
-					transformUsingConfiguration(pageEntity);
-					if (page.get().getApi() != null) {
-						transformWithTemplate(pageEntity, page.get().getApi());
-					}
-				}
-
 				return pageEntity;
 			}
 
@@ -218,11 +203,50 @@ public class PageServiceImpl extends TransactionalService implements PageService
 		}
 	}
 
+//	public PageEntity findById(String pageId, boolean transform) {
+//		try {
+//			logger.debug("Find page by ID: {}", pageId);
+//
+//			Optional<Page> page = pageRepository.findById(pageId);
+//
+//			if (page.isPresent()) {
+//				PageEntity pageEntity = convert(page.get());
+//				if (transform) {
+//					transformUsingConfiguration(pageEntity);
+//					if (page.get().getApi() != null) {
+//						transformWithTemplate(pageEntity, page.get().getApi());
+//					}
+//				}
+//
+//				return pageEntity;
+//			}
+//
+//			throw new PageNotFoundException(pageId);
+//		} catch (TechnicalException ex) {
+//			logger.error("An error occurs while trying to find a page using its ID {}", pageId, ex);
+//			throw new TechnicalManagementException(
+//					"An error occurs while trying to find a page using its ID " + pageId, ex);
+//		}
+//	}
+
+	@Override
+	public void transformSwagger(PageEntity pageEntity) {
+		transformSwagger(pageEntity, null);
+    }
+
+	@Override
+	public void transformSwagger(PageEntity pageEntity, String apiId) {
+		transformUsingConfiguration(pageEntity);
+		if (apiId != null) {
+			transformWithTemplate(pageEntity, apiId);
+		}
+	}
+
 	@Override
 	public List<PageEntity> search(PageQuery query) {
-		List<PageListItem> pageListItem;
+		List<PageListItem> pageListItem= emptyList();
 	    if (query.getApi() != null) {
-			pageListItem = findApiPagesByApi(query.getApi());
+			//pageListItem = findApiPagesByApi(query.getApi());
 		} else {
 	    	pageListItem = emptyList();
 		}
@@ -653,44 +677,44 @@ public class PageServiceImpl extends TransactionalService implements PageService
 						RolePermissionAction.DELETE});
 	}
 
-	private PageListItem reduce(Page page) {
-		PageListItem pageItem = new PageListItem();
+//	private PageListItem reduce(Page page) {
+//		PageListItem pageItem = new PageListItem();
+//
+//		pageItem.setId(page.getId());
+//		pageItem.setName(page.getName());
+//		pageItem.setType(PageType.valueOf(page.getType().toString()));
+//		pageItem.setOrder(page.getOrder());
+//		pageItem.setLastContributor(page.getLastContributor());
+//		pageItem.setPublished(page.isPublished());
+//		pageItem.setHomepage(page.isHomepage());
+//		pageItem.setSource(convert(page.getSource()));
+//		pageItem.setConfiguration(page.getConfiguration());
+//		pageItem.setExcludedGroups(page.getExcludedGroups());
+//
+//		return pageItem;
+//	}
 
-		pageItem.setId(page.getId());
-		pageItem.setName(page.getName());
-		pageItem.setType(PageType.valueOf(page.getType().toString()));
-		pageItem.setOrder(page.getOrder());
-		pageItem.setLastContributor(page.getLastContributor());
-		pageItem.setPublished(page.isPublished());
-		pageItem.setHomepage(page.isHomepage());
-		pageItem.setSource(convert(page.getSource()));
-		pageItem.setConfiguration(page.getConfiguration());
-		pageItem.setExcludedGroups(page.getExcludedGroups());
-
-		return pageItem;
-	}
-
-    private PageListItem reduce(Page page, Map<String, List<Page>> groupedParent) {
-        PageListItem pageItem = new PageListItem();
-
-        pageItem.setId(page.getId());
-        pageItem.setName(page.getName());
-        pageItem.setType(PageType.valueOf(page.getType().toString()));
-        pageItem.setOrder(page.getOrder());
-        pageItem.setLastContributor(page.getLastContributor());
-        pageItem.setUpdatedAt(page.getUpdatedAt());
-        pageItem.setPublished(page.isPublished());
-        pageItem.setHomepage(page.isHomepage());
-        pageItem.setSource(convert(page.getSource()));
-        pageItem.setConfiguration(page.getConfiguration());
-        pageItem.setExcludedGroups(page.getExcludedGroups());
-
-        if(groupedParent != null && groupedParent.containsKey(page.getId())) {
-            pageItem.setPages(groupedParent.get(page.getId()).stream().map((p) -> this.reduce(p,groupedParent)).collect(Collectors.toList()));
-        }
-
-        return pageItem;
-    }
+//    private PageListItem reduce(Page page, Map<String, List<Page>> groupedParent) {
+//        PageListItem pageItem = new PageListItem();
+//
+//        pageItem.setId(page.getId());
+//        pageItem.setName(page.getName());
+//        pageItem.setType(PageType.valueOf(page.getType().toString()));
+//        pageItem.setOrder(page.getOrder());
+//        pageItem.setLastContributor(page.getLastContributor());
+//        pageItem.setUpdatedAt(page.getUpdatedAt());
+//        pageItem.setPublished(page.isPublished());
+//        pageItem.setHomepage(page.isHomepage());
+//        pageItem.setSource(convert(page.getSource()));
+//        pageItem.setConfiguration(page.getConfiguration());
+//        pageItem.setExcludedGroups(page.getExcludedGroups());
+//
+//        if(groupedParent != null && groupedParent.containsKey(page.getId())) {
+//            pageItem.setPages(groupedParent.get(page.getId()).stream().map((p) -> this.reduce(p,groupedParent)).collect(Collectors.toList()));
+//        }
+//
+//        return pageItem;
+//    }
 
 	private static Page convert(NewPageEntity newPageEntity) {
 		Page page = new Page();
