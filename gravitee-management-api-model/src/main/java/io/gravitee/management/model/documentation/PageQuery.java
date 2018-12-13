@@ -29,6 +29,7 @@ public class PageQuery {
     private Boolean homepage;
     private Boolean published;
     private String parent;
+    private Boolean rootParent;
 
     private PageQuery() {}
 
@@ -50,6 +51,10 @@ public class PageQuery {
     public String getParent() {
         return parent;
     }
+    public Boolean getRootParent() {
+        return rootParent;
+    }
+
 
     private void setApi(String api) {
         this.api = api;
@@ -68,6 +73,9 @@ public class PageQuery {
     }
     private void setParent(String parent) {
         this.parent = parent;
+    }
+    public void setRootParent(Boolean rootParent) {
+        this.rootParent = rootParent;
     }
 
     public static class Builder {
@@ -109,6 +117,11 @@ public class PageQuery {
 
         public Builder parent(String parent) {
             this.query.setParent(parent);
+            return this;
+        }
+
+        public Builder rootParent(Boolean root) {
+            this.query.setRootParent(root);
             return this;
         }
     }

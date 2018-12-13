@@ -38,6 +38,7 @@ import io.gravitee.plugin.fetcher.FetcherPlugin;
 import io.gravitee.plugin.fetcher.FetcherPluginManager;
 import io.gravitee.repository.exceptions.TechnicalException;
 import io.gravitee.repository.management.api.PageRepository;
+import io.gravitee.repository.management.api.search.PageCriteria;
 import io.gravitee.repository.management.model.Audit;
 import io.gravitee.repository.management.model.MembershipReferenceType;
 import io.gravitee.repository.management.model.Page;
@@ -244,27 +245,13 @@ public class PageServiceImpl extends TransactionalService implements PageService
 
 	@Override
 	public List<PageEntity> search(PageQuery query) {
-		List<PageListItem> pageListItem= emptyList();
-	    if (query.getApi() != null) {
-			//pageListItem = findApiPagesByApi(query.getApi());
-		} else {
-	    	pageListItem = emptyList();
+		try {
+			return convert(pageRepository.search(queryToCriteria(query)));
+		} catch (TechnicalException ex) {
+			logger.error("An error occurs while trying to search pages", ex);
+			throw new TechnicalManagementException(
+					"An error occurs while trying to search pages", ex);
 		}
-
-		return pageListItem.
-				stream().
-				filter(p -> {
-					boolean filtered = true;
-					if (query.getName() != null) {
-						filtered = p.getName().equals(query.getName());
-					}
-					if (filtered && query.getType() != null) {
-						filtered = p.getType().equals(query.getType());
-					}
-					return filtered;
-				}).
-				map(p -> findById(p.getId())).
-				collect(Collectors.toList());
 	}
 
 	private void transformUsingConfiguration(final PageEntity pageEntity) {
@@ -406,8 +393,8 @@ public class PageServiceImpl extends TransactionalService implements PageService
 		if(page.isHomepage()) {
 			Collection<Page> pages =
 					page.getApi() != null ?
-					pageRepository.findApiPageByApiIdAndHomepage(page.getApi(), true) :
-					pageRepository.findPortalPageByHomepage(true);
+							pageRepository.search(new PageCriteria.Builder().api(page.getApi()).homepage(true).build()) :
+							pageRepository.search(new PageCriteria.Builder().homepage(true).build());
 			pages.stream().
 					filter(i -> !i.getId().equals(page.getId())).
 					forEach(i -> {
@@ -515,7 +502,13 @@ public class PageServiceImpl extends TransactionalService implements PageService
 	}
 
     private void reorderAndSavePages(final Page pageToReorder) throws TechnicalException {
-		final Collection<Page> pages = pageRepository.findApiPageByApiId(pageToReorder.getApi());
+		PageCriteria.Builder q = new PageCriteria.Builder().api(pageToReorder.getApi());
+		if (pageToReorder.getParentId() == null) {
+			q.rootParent(Boolean.TRUE);
+		} else {
+			q.parent(pageToReorder.getParentId());
+		}
+		final Collection<Page> pages = pageRepository.search(q.build());
         final List<Boolean> increment = asList(true);
         pages.stream()
             .sorted(Comparator.comparingInt(Page::getOrder))
@@ -732,9 +725,17 @@ public class PageServiceImpl extends TransactionalService implements PageService
 		page.setSource(convert(newPageEntity.getSource()));
 		page.setConfiguration(newPageEntity.getConfiguration());
 		page.setExcludedGroups(newPageEntity.getExcludedGroups());
-		page.setParentId(newPageEntity.getParentId());
+		page.setParentId("".equals(newPageEntity.getParentId()) ? null : newPageEntity.getParentId());
 
 		return page;
+	}
+
+	private static List<PageEntity> convert(List<Page> pages) {
+		if (pages == null) {
+			return emptyList();
+		}
+
+		return pages.stream().map(PageServiceImpl::convert).collect(Collectors.toList());
 	}
 
 	private static PageEntity convert(Page page) {
@@ -774,7 +775,7 @@ public class PageServiceImpl extends TransactionalService implements PageService
 			pageEntity.setConfiguration(page.getConfiguration());
 		}
 		pageEntity.setExcludedGroups(page.getExcludedGroups());
-		pageEntity.setParentId(page.getParentId());
+		pageEntity.setParentId("".equals(page.getParentId()) ? null : page.getParentId());
 		return pageEntity;
 	}
 
@@ -831,7 +832,7 @@ public class PageServiceImpl extends TransactionalService implements PageService
         page.setConfiguration(updatePageEntity.getConfiguration());
 		page.setHomepage(Boolean.TRUE.equals(updatePageEntity.isHomepage()));
         page.setExcludedGroups(updatePageEntity.getExcludedGroups());
-        page.setParentId(updatePageEntity.getParentId());
+		page.setParentId("".equals(updatePageEntity.getParentId()) ? null : updatePageEntity.getParentId());
 		return page;
 	}
 
@@ -894,5 +895,21 @@ public class PageServiceImpl extends TransactionalService implements PageService
 					newValue
 			);
 		}
+	}
+
+	private PageCriteria queryToCriteria(PageQuery query) {
+		final PageCriteria.Builder builder = new PageCriteria.Builder();
+		if (query != null) {
+			builder.homepage(query.getHomepage());
+			builder.api(query.getApi());
+			builder.name(query.getName());
+			builder.parent(query.getParent());
+			builder.published(query.getPublished());
+			if(query.getType() != null) {
+				builder.type(query.getType().name());
+			}
+			builder.rootParent(query.getRootParent());
+		}
+		return builder.build();
 	}
 }

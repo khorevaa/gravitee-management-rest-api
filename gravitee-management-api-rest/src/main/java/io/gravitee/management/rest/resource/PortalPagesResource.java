@@ -18,6 +18,7 @@ package io.gravitee.management.rest.resource;
 import io.gravitee.common.http.MediaType;
 import io.gravitee.management.model.NewPageEntity;
 import io.gravitee.management.model.PageEntity;
+import io.gravitee.management.model.PageType;
 import io.gravitee.management.model.UpdatePageEntity;
 import io.gravitee.management.model.documentation.PageQuery;
 import io.gravitee.management.model.permissions.RolePermission;
@@ -97,11 +98,17 @@ public class PortalPagesResource extends AbstractResource {
             @ApiResponse(code = 500, message = "Internal server error")})
     public List<PageEntity> listPages(
             @QueryParam("homepage") Boolean homepage,
-            @QueryParam("parent") String parent) {
+            @QueryParam("type") PageType type,
+            @QueryParam("parent") String parent,
+            @QueryParam("name") String name,
+            @QueryParam("root") Boolean rootParent) {
         return pageService
                 .search(new PageQuery.Builder()
                         .homepage(homepage)
+                        .type(type)
                         .parent(parent)
+                        .name(name)
+                        .rootParent(rootParent)
                         .build())
                 .stream()
                 .filter(page -> isDisplayable(page.isPublished(), page.getExcludedGroups()))
